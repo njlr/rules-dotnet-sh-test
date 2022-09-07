@@ -9,6 +9,7 @@ fsharp_binary(
   deps = [
     "@paket.main//microsoft.netcore.app.ref",
     "@paket.main//fsharp.core",
+    "@paket.main//docker.dotnet",
   ],
   visibility = [
     "//visibility:public",
