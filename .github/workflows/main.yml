@@ -26,5 +26,6 @@ jobs:
 
     - name: Build and Test
       run: |
+        docker version
         bazel build //...
         bazel test --test_output=all //...

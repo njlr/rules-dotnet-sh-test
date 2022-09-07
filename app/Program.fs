@@ -1,4 +1,5 @@
 ﻿open System
+open System.Runtime.InteropServices
 open System.Threading
 open System.Threading.Tasks
 open Docker.DotNet
@@ -17,7 +18,13 @@ let main argv =
     task {
       printfn "Starting Docker..."
 
-      use client = (new DockerClientConfiguration()).CreateClient()
+      use config =
+        if RuntimeInformation.IsOSPlatform(OSPlatform.OSX) then
+          new DockerClientConfiguration(Uri "unix:///var/run/docker.sock")
+        else
+          new DockerClientConfiguration()
+
+      use client = config.CreateClient()
 
       printfn "Creating image..."
 
@@ -52,10 +59,14 @@ let main argv =
 
       printfn "Stopping container..."
 
+      let csps = ContainerStopParameters()
+
+      csps.WaitBeforeKillSeconds <- 30u
+
       let! wasStopped =
         client.Containers.StopContainerAsync(
           ccr.ID,
-          ContainerStopParameters(),
+          csps,
           CancellationToken.None)
 
       printfn $"{wasStopped}"
